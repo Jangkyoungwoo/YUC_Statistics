@@ -1,9 +1,10 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import XLSX from "sheetjs-style";
+import HousingTransgerExpense from "./HousingTransferExpenses";
 
 const API_KEY = process.env.REACT_APP_API_KEY + "=";
-const reqUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U001/2/1/20231101103458&prdSe=Q&newEstPrdCnt=3`;
+const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U001/2/1/20231101103458&prdSe=Q&newEstPrdCnt=3`;
 
 function App() {
   const [statisticsData, setStatisticsData] = useState([]);
@@ -11,10 +12,8 @@ function App() {
   //가구원수별 가구당 월평균 가계수지(도시 1인 이상) api불러오기
   const getStatisticsData = async () => {
     try {
-      const res = await axios.get(reqUrl);
+      const res = await axios.get(houseHoldsTotalIncomeAndExpenditureUrl);
       setStatisticsData(res.data);
-      console.log(res.data);
-      console.log(Array.isArray(res.data));
     } catch (error) {
       console.log(error);
     }
@@ -28,21 +27,10 @@ function App() {
   };
   useEffect(() => {
     getStatisticsData();
-  }, [reqUrl]);
+  }, [houseHoldsTotalIncomeAndExpenditureUrl]);
   return (
     <div>
-      {statisticsData.map((statisticsData) => (
-        <div key={Number(statisticsData.DT)}>
-          <div>
-            <span>가계수지항목별: </span>
-            <span>{statisticsData.C1_NM}</span>
-          </div>
-          <div>
-            <span>가구 (원): </span>
-            <span>{statisticsData.DT}</span>
-          </div>
-        </div>
-      ))}
+      <HousingTransgerExpense></HousingTransgerExpense>
       <h1>Execl Export</h1>
       <button onClick={() => exportdata(statisticsData)}>산출</button>
     </div>
