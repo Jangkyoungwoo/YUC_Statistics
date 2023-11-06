@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import XLSX from "sheetjs-style";
+import RelocationSettlementFee from "./RelocationSettlementFee";
 import HousingTransgerExpense from "./HousingTransferExpenses";
+import MovingExpense from "./MovingExpenses";
 
 const API_KEY = process.env.REACT_APP_API_KEY + "=";
 const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U001/2/1/20231101103458&prdSe=Q&newEstPrdCnt=3`;
@@ -30,7 +32,11 @@ function App() {
   }, [houseHoldsTotalIncomeAndExpenditureUrl]);
   return (
     <div>
-      <HousingTransgerExpense></HousingTransgerExpense>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <RelocationSettlementFee></RelocationSettlementFee>
+        <HousingTransgerExpense></HousingTransgerExpense>
+        <MovingExpense></MovingExpense>
+      </div>
       <h1>Execl Export</h1>
       <button onClick={() => exportdata(statisticsData)}>산출</button>
     </div>
