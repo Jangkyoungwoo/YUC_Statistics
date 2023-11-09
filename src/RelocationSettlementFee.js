@@ -1,17 +1,18 @@
 import { useState } from "react";
 
 function RelocationSettlementFee() {
-  const [inputVal, setInputVal] = useState();
+  const [inputAmountVal, setInputAmountVal] = useState("");
+  const [inputShareVal, setInputShareVal] = useState("");
   const [amountResult, setAmountResult] = useState("");
   const [cDate, setCDate] = useState("");
-  let inputAmount;
-  let date;
-  const calAmount = (inputVal, cDate) => {
+  let inputAmount, inputShare, date;
+  const calAmount = (inputAmountVal, cDate) => {
     let amount;
     let result = 0;
     let currentDate = cDate;
     const standardDate = new Date("2020-12-11");
-    amount = Math.floor(Math.round(inputVal * 0.3) / 10) * 10;
+    amount =
+      Math.floor(Math.round(inputAmountVal * 0.3) / 10) * 10 * inputShareVal;
     if (currentDate > standardDate) {
       if (amount < 12000000) {
         result = 12000000;
@@ -44,14 +45,25 @@ function RelocationSettlementFee() {
 
   return (
     <div>
+      <h1>이주정착금</h1>
       <span>주거용 건축물 금액</span>
       <input
         type="text"
         onChange={(event) => {
           inputAmount = Number(event.target.value);
-          setInputVal(inputAmount);
+          setInputAmountVal(inputAmount);
         }}
       ></input>
+      <div>
+        <span>지분</span>
+        <input
+          type="text"
+          onChange={(event) => {
+            inputShare = Number(event.target.value);
+            setInputShareVal(inputShare);
+          }}
+        ></input>
+      </div>
       <div>
         <input
           type="date"
@@ -62,7 +74,7 @@ function RelocationSettlementFee() {
         ></input>
         <button
           onClick={() => {
-            calAmount(inputVal, cDate);
+            calAmount(inputAmountVal, cDate);
           }}
         >
           이주정착금 산정

@@ -8,17 +8,12 @@ import MovingExpense from "./MovingExpenses";
 const API_KEY = process.env.REACT_APP_API_KEY + "=";
 const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U001/2/1/20231101103458&prdSe=Q&newEstPrdCnt=3`;
 
-function App() {
+function App({ totalVal }) {
   const [statisticsData, setStatisticsData] = useState([]);
 
-  //가구원수별 가구당 월평균 가계수지(도시 1인 이상) api불러오기
+  //가구원수별 가구당 월평균 가계수지(도시 1인 이상) 불러오기
   const getStatisticsData = async () => {
-    try {
-      const res = await axios.get(houseHoldsTotalIncomeAndExpenditureUrl);
-      setStatisticsData(res.data);
-    } catch (error) {
-      console.log(error);
-    }
+    setStatisticsData(totalVal);
   };
   //액셀로 내보내기
   const exportdata = (data) => {
@@ -27,9 +22,7 @@ function App() {
     XLSX.utils.book_append_sheet(wb, ws, "items");
     XLSX.writeFile(wb, "items.xlsx");
   };
-  useEffect(() => {
-    getStatisticsData();
-  }, [houseHoldsTotalIncomeAndExpenditureUrl]);
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
