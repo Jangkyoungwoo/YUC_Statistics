@@ -13,6 +13,7 @@ function MovingExpense() {
   const [selectVal, setSelectVal] = useState([]);
   const [inputAreaVal, setInputAreaVal] = useState("");
   const [inputCostVal, setInputCostVal] = useState("");
+  const [dataToSend, setDataToSend] = useState("");
   let areaVal;
   let vehicleCostVal = 222000; //차량운임비
   //노임단가 API 호출
@@ -20,7 +21,6 @@ function MovingExpense() {
     const updatedPriceOfWage = [];
     try {
       const res = await axios.get(priceOfWageUrl);
-      console.log(res.data);
       setInitialVal(res.data);
       //인원별 임금 계산
       for (let i = 3; i < 7; i++) {
@@ -78,7 +78,7 @@ function MovingExpense() {
     }
   };
   //입력한 면적에 따른 면적 기준
-  const standardArea = (area) => {
+  const standardArea = () => {
     if (inputAreaVal < 33) {
       return "33m² 미만";
     } else if (inputAreaVal >= 33 && inputAreaVal < 49.5) {
@@ -111,6 +111,7 @@ function MovingExpense() {
           onChange={(event) => {
             areaVal = Number(event.target.value);
             setInputAreaVal(areaVal);
+            combinedArr();
           }}
         ></input>
       </div>
@@ -167,6 +168,7 @@ function MovingExpense() {
           </tr>
         </tbody>
       </MEStyle.Table>
+      <div>{selectVal.sum}</div>
     </div>
   );
 }

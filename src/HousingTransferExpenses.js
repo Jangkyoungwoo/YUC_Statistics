@@ -124,13 +124,13 @@ function HousingTransgerExpense() {
       setPeopleTotalVal(totalVal.filter((arr) => arr.people === "5인이상"));
     }
   };
-  const filterOwner = (owner) => {
+  const filterOwner = (people, owner) => {
     let res;
     switch (owner) {
       case "owner":
         res = totalVal.map((data) => data.twoMon);
         if (res.length > 0) {
-          switch (inputPeople) {
+          switch (people) {
             case 1:
               setResult(res[0]);
               break;
@@ -152,7 +152,8 @@ function HousingTransgerExpense() {
       case "newer":
         res = totalVal.map((data) => data.fourMon);
         if (res.length > 0) {
-          switch (inputPeople) {
+          // eslint-disable-next-line default-case
+          switch (people) {
             case 1:
               setResult(res[0]);
               break;
@@ -176,9 +177,9 @@ function HousingTransgerExpense() {
   useEffect(() => {
     getStatisticsData();
   }, []);
-  /*useEffect(() => {
-    calMonth(inputVal);
-  }, []);*/
+  useEffect(() => {
+    filterOwner();
+  }, [inputPeople]);
 
   return (
     <div>
@@ -205,14 +206,15 @@ function HousingTransgerExpense() {
           onChange={(event) => {
             inputpVal = Number(event.target.value);
             setInputPeople(inputpVal);
+            filterPeople(inputpVal);
+            filterOwner(inputpVal, inputSelectVal);
           }}
         ></input>
         <select
           onChange={(event) => {
             selectVal = event.target.value;
             setInputSelectVal(selectVal);
-            filterOwner(selectVal);
-            console.log({ result });
+            filterOwner(inputPeople, selectVal);
           }}
         >
           <option value="none">소유자 구분</option>
