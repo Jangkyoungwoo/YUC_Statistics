@@ -1,21 +1,128 @@
-import MovingExpense from "./MovingExpenses";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import * as MEStyle from "./style/MovingExpenses.style";
 import * as HTEStyle from "./style/HousingTransferExpenses.style";
+import * as Result from "./style/Result.style";
+import axios from "axios";
 
 const API_KEY = process.env.REACT_APP_API_KEY + "=";
 const priceOfWageUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/365/TX_36504_A001_1/2/1/20231106140112&prdSe=H&newEstPrdCnt=1`;
 const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U027/2/1/20231106103754&prdSe=Y&startPrdDe=2022&endPrdDe=2022`;
 
 function Total() {
+  //청구인, 대상적격여부 확인
+  const [inputName, setInputName] = useState("");
+  const [inputOwner, setInputOwner] = useState("");
+  const [inputNewer, setinputNewer] = useState("");
+  const [inputMovingDate, setInputMovingDate] = useState("");
+  const [inputDisagreeNewer, setinputDisagreeNewer] = useState("");
   const [getSum, setGetSum] = useState();
+  const [note, setNote] = useState("적법건축물");
+  const [inputList, setInputList] = useState({
+    inputAdress: "",
+    inputClaimant: "",
+    inputEligibility: "",
+    inputAgreeDay: "",
+    inputUsage: "",
+    inputMoveInDate: "",
+  });
   //이주정착금
   const [inputAmountVal, setInputAmountVal] = useState("");
   const [inputShareVal, setInputShareVal] = useState("");
   const [amountResult, setAmountResult] = useState("");
   const [cDate, setCDate] = useState("");
   let inputAmount, inputShare, date;
+  //주거이전비
+  const [tinitialVal, settInitialVal] = useState([]);
+  const [ttotalVal, settTotalVal] = useState([]);
+  const [peopletTotalVal, setPeopletTotalVal] = useState([]);
+  const [inputSelectVal, setInputSelectVal] = useState("");
+  const [inputPeople, setInputPeople] = useState("");
+  const [result, setResult] = useState("");
+  let inputpVal, selectVal;
+  //이사비
+  const [minitialVal, setMInitialVal] = useState([]);
+  const [priceOfWage, setPriceOfWage] = useState([]);
+  const [vehicleCost, setVehicleCost] = useState([]);
+  const [mtotalVal, setmTotalVal] = useState([]);
+  const [mselectVal, setmselectVal] = useState([]);
+  const [inputAreaVal, setInputAreaVal] = useState("");
+  let areaVal;
+  let vehicleCostVal = 222000; //차량운임비
+  const fnNote = () => {
+    if (
+      inputList.inputEligibility === "disagree" ||
+      inputList.inputUsage === "nonhouse"
+    ) {
+      const data = "무허가";
+      setNote(data);
+    } else {
+      const data = "적법건축물";
+      setNote(data);
+    }
+  };
+  const relocationSettlementEligibility = () => {
+    if (
+      inputList.inputEligibility === "agree" &&
+      inputList.inputAgreeDay < cDate &&
+      inputList.inputUsage === "house" &&
+      inputSelectVal === "owner" &&
+      inputList.inputMoveInDate < cDate
+    ) {
+      calAmount(inputAmountVal, cDate);
+    } else {
+      setAmountResult(0);
+      totalSum();
+    }
+  };
+  const housingTransferExpensesEligibility = () => {
+    if (
+      inputList.inputEligibility === "agree" &&
+      inputList.inputAgreeDay < inputOwner &&
+      inputList.inputUsage === "house" &&
+      inputSelectVal === "owner" &&
+      inputList.inputMoveInDate < inputOwner
+    ) {
+      filterOwner(inputPeople, inputSelectVal);
+    } else {
+      if (
+        inputList.inputEligibility === "agree" &&
+        inputList.inputAgreeDay < inputNewer &&
+        inputList.inputUsage === "house" &&
+        inputList.inputMoveInDate < inputNewer
+      ) {
+        filterOwner(inputPeople, inputSelectVal);
+      } else {
+        if (
+          note === "무허가" &&
+          inputList.inputMoveInDate < inputDisagreeNewer
+        ) {
+          filterOwner(inputPeople, inputSelectVal);
+        } else {
+          setResult(0);
+        }
+      }
+    }
+  };
+  const movingExpenseEligibility = () => {
+    if (inputList.inputMoveInDate < inputMovingDate) {
+      selectArr();
+      console.log(mselectVal.sum);
+    } else {
+      setmselectVal((prevState) => ({
+        ...prevState,
+        sum: 0,
+      }));
+      console.log(mselectVal.sum);
+    }
+  };
+
+  //총지급액 계산
+  const totalSum = () => {
+    const sum = amountResult + result + mselectVal.sum;
+    setGetSum(sum);
+  };
+
+  //이주정착금 함수 모음
   const calAmount = (inputAmountVal, cDate) => {
     let amount;
     let result = 0;
@@ -27,40 +134,28 @@ function Total() {
       if (amount < 12000000) {
         result = 12000000;
         setAmountResult(result);
-        console.log(result);
       } else if (amount > 24000000) {
         result = 24000000;
         setAmountResult(result);
-        console.log(result);
       } else {
         result = amount;
         setAmountResult(result);
-        console.log(result);
       }
     } else {
       if (amount < 6000000) {
         result = 6000000;
         setAmountResult(result);
-        console.log(result);
       } else if (amount > 12000000) {
         result = 12000000;
         setAmountResult(result);
       } else {
         result = amount;
         setAmountResult(result);
-        console.log(result);
       }
     }
   };
-  //주거이전비
-  const [tinitialVal, settInitialVal] = useState([]);
-  const [ttotalVal, settTotalVal] = useState([]);
-  const [peopletTotalVal, setPeopletTotalVal] = useState([]);
-  const [inputSelectVal, setInputSelectVal] = useState("");
-  const [inputPeople, setInputPeople] = useState("");
-  const [result, setResult] = useState("");
-  let inputpVal, selectVal;
 
+  //주거이전비 함수 모음
   //가구원수별 가구당 월평균 가계수지(도시 1인 이상) api불러오기
   const getStatisticsData = async () => {
     try {
@@ -82,6 +177,26 @@ function Total() {
       twoMon: Math.floor((Math.round(data.DT) * 2) / 10) * 10,
       fourMon: Math.floor((Math.round(data.DT) * 4) / 10) * 10,
     }));
+    let sixMan, sevenMan;
+    const fiveVal = Math.round(Number(val[4].DT));
+    const twoVal = Math.round(Number(val[1].DT));
+    sixMan = {
+      people: "6인",
+      oneMon: Math.round(fiveVal + ((fiveVal - twoVal) / 3) * 1),
+      twoMon: Math.round((fiveVal + (fiveVal - twoVal) / 3) * 2),
+      fourMon: Math.round((fiveVal + (fiveVal - twoVal) / 3) * 4),
+    };
+    newArr.push(sixMan);
+    sevenMan = {
+      people: "7인",
+      oneMon: Math.round(fiveVal + ((fiveVal - twoVal) / 3) * 2),
+      twoMon: Math.round((fiveVal + ((fiveVal - twoVal) / 3) * 2) * 2),
+      fourMon: Math.round((fiveVal + ((fiveVal - twoVal) / 3) * 2) * 4),
+    };
+    console.log(newArr);
+    newArr.push(sevenMan);
+
+    console.log(Math.round((fiveVal + (fiveVal - twoVal) / 3) * 2));
     settTotalVal(newArr);
   };
   //인구별 필터링
@@ -94,8 +209,12 @@ function Total() {
       setPeopletTotalVal(ttotalVal.filter((arr) => arr.people === "3인"));
     } else if (people === 4) {
       setPeopletTotalVal(ttotalVal.filter((arr) => arr.people === "4인"));
-    } else if (people >= 5) {
+    } else if (people === 5) {
       setPeopletTotalVal(ttotalVal.filter((arr) => arr.people === "5인이상"));
+    } else if (people === 6) {
+      setPeopletTotalVal(ttotalVal.filter((arr) => arr.people === "6인"));
+    } else if (people === 7) {
+      setPeopletTotalVal(ttotalVal.filter((arr) => arr.people === "7인"));
     }
   };
   //소유구분별 필터링
@@ -153,15 +272,8 @@ function Total() {
   useEffect(() => {
     filterOwner();
   }, [inputPeople]);
-  //이사비
-  const [minitialVal, setMInitialVal] = useState([]);
-  const [priceOfWage, setPriceOfWage] = useState([]);
-  const [vehicleCost, setVehicleCost] = useState([]);
-  const [mtotalVal, setmTotalVal] = useState([]);
-  const [mselectVal, setmselectVal] = useState([]);
-  const [inputAreaVal, setInputAreaVal] = useState("");
-  let areaVal;
-  let vehicleCostVal = 222000; //차량운임비
+
+  //이사비 함수모음
   //노임단가 API 호출
   const getMovingStatisticsData = async () => {
     const updatedPriceOfWage = [];
@@ -238,12 +350,6 @@ function Total() {
     }
   };
 
-  //총지급액 계산
-  const totalSum = () => {
-    const sum = amountResult + result + mselectVal.sum;
-    setGetSum(sum);
-  };
-
   useEffect(() => {
     getMovingStatisticsData();
     getStatisticsData();
@@ -256,18 +362,112 @@ function Total() {
   return (
     <div>
       <div>
+        <span>사업명</span>
+        <input
+          type="text"
+          onChange={(event) => {
+            const inputName = event.target.value;
+            setInputName(inputName);
+          }}
+        ></input>
+        <div>
+          <span>기준일자</span>
+          <Result.table>
+            <thead>
+              <tr>
+                <Result.th>구분</Result.th>
+                <Result.th>소유자</Result.th>
+                <Result.th>
+                  세입자
+                  <br />
+                  (적법건물)
+                </Result.th>
+                <Result.th>
+                  세입자
+                  <br />
+                  (무허가 불법건물)
+                </Result.th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Result.td>이주정착금</Result.td>
+                <Result.td>
+                  <input
+                    type="date"
+                    onChange={(event) => {
+                      const inputMoveInDate = event.target.value;
+                    }}
+                  ></input>
+                </Result.td>
+                <Result.td></Result.td>
+                <Result.td></Result.td>
+              </tr>
+              <tr>
+                <Result.td>주거이전비</Result.td>
+                <Result.td>
+                  <input
+                    type="date"
+                    onChange={(event) => {
+                      const data = new Date(event.target.value);
+                      setInputOwner(data);
+                    }}
+                  ></input>
+                </Result.td>
+                <Result.td>
+                  <input
+                    type="date"
+                    onChange={(event) => {
+                      const data = new Date(event.target.value);
+                      setinputNewer(data);
+                    }}
+                  ></input>
+                </Result.td>
+                <Result.td>
+                  <input
+                    type="date"
+                    onChange={(event) => {
+                      const data = new Date(event.target.value);
+                      setinputDisagreeNewer(data);
+                    }}
+                  ></input>
+                </Result.td>
+              </tr>
+              <tr>
+                <Result.td>이사비</Result.td>
+                <Result.td colspan="3">
+                  <input
+                    type="date"
+                    onChange={(event) => {
+                      const data = new Date(event.target.value);
+                      setInputMovingDate(data);
+                    }}
+                  ></input>
+                </Result.td>
+              </tr>
+            </tbody>
+          </Result.table>
+        </div>
         <span>가옥소재지</span>
         <input
           type="text"
           onChange={(event) => {
-            //inputShare = Number(event.target.value);
+            const inputAdress = event.target.value;
+            setInputList((prevState) => ({
+              ...prevState,
+              inputAdress: inputAdress,
+            }));
           }}
         ></input>
         <span>청구인</span>
         <input
           type="text"
           onChange={(event) => {
-            //inputShare = Number(event.target.value);
+            const inputClaimant = event.target.value;
+            setInputList((prevState) => ({
+              ...prevState,
+              inputClaimant: inputClaimant,
+            }));
           }}
         ></input>
       </div>
@@ -275,7 +475,17 @@ function Total() {
         <h3>대상적격</h3>
         <select
           onChange={(event) => {
-            //selectVal = event.target.value;
+            const inputEligibility = event.target.value;
+            setInputList((prevState) => ({
+              ...prevState,
+              inputEligibility: inputEligibility,
+            }));
+            if (inputEligibility === "disagree") {
+              setAmountResult(0);
+            } else if (inputEligibility === "agree") {
+              filterOwner(inputPeople, inputSelectVal);
+              calAmount(inputAmountVal, cDate);
+            }
           }}
         >
           <option value="none">허가여부</option>
@@ -286,12 +496,27 @@ function Total() {
         <input
           type="date"
           onChange={(event) => {
-            //date = event.target.value;
+            const inputAgreeDay = new Date(event.target.value);
+            setInputList((prevState) => ({
+              ...prevState,
+              inputAgreeDay: inputAgreeDay,
+            }));
           }}
         ></input>
         <select
           onChange={(event) => {
-            //selectVal = event.target.value;
+            const inputUsage = event.target.value;
+            setInputList((prevState) => ({
+              ...prevState,
+              inputUsage: inputUsage,
+            }));
+            if (inputUsage === "nonhouse") {
+              setAmountResult(0);
+              setResult(0);
+            } else if (inputUsage === "house") {
+              filterOwner(inputPeople, inputSelectVal);
+              calAmount(inputAmountVal, cDate);
+            }
           }}
         >
           <option value="none">용도</option>
@@ -302,9 +527,16 @@ function Total() {
         <input
           type="date"
           onChange={(event) => {
-            //date = event.target.value;
+            const inputMoveInDate = new Date(event.target.value);
+            setInputList((prevState) => ({
+              ...prevState,
+              inputMoveInDate: inputMoveInDate,
+            }));
           }}
         ></input>
+        <span>비고: </span>
+        <span>{note}</span>
+        <button onClick={fnNote}>입력</button>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
@@ -333,11 +565,13 @@ function Total() {
               onChange={(event) => {
                 date = event.target.value;
                 setCDate(new Date(date));
+                calAmount(inputAmountVal, cDate);
+                relocationSettlementEligibility();
               }}
             ></input>
             <button
               onClick={() => {
-                calAmount(inputAmountVal, cDate);
+                relocationSettlementEligibility();
               }}
             >
               이주정착금 산정
@@ -378,9 +612,7 @@ function Total() {
             </select>
             <button
               onClick={() => {
-                filterPeople(inputPeople);
-                filterOwner(inputSelectVal);
-                //calPeople(inputPeople);
+                housingTransferExpensesEligibility();
                 console.log(result);
               }}
             >
@@ -449,7 +681,8 @@ function Total() {
           </div>
           <button
             onClick={() => {
-              selectArr();
+              movingExpenseEligibility();
+              console.log(inputList.inputMoveInDate < inputMovingDate);
             }}
           >
             산정
@@ -485,9 +718,44 @@ function Total() {
           </MEStyle.Table>
           <div>{mselectVal.sum}</div>
         </div>
-        <button onClick={totalSum}>합계 출력</button>
-        <span>합계: </span>
-        <div>{getSum}</div>
+      </div>
+      <div>
+        <button
+          onClick={() => {
+            totalSum();
+            console.log(inputSelectVal);
+          }}
+        >
+          합계 출력
+        </button>
+        <Result.table>
+          <thead>
+            <tr>
+              <Result.th>총 지급액</Result.th>
+              <Result.th>이주정착금</Result.th>
+              <Result.th>주거이전비</Result.th>
+              <Result.th>이사비</Result.th>
+              <Result.th>지급대상</Result.th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <Result.td>{getSum}</Result.td>
+              <Result.td>
+                {amountResult === 0 ? "부적격" : amountResult}
+              </Result.td>
+              <Result.td>{result === 0 ? "부적격" : result}</Result.td>
+              <Result.td>
+                {mselectVal.sum === 0 ? "부적격" : mselectVal.sum}
+              </Result.td>
+              <Result.td>
+                {amountResult === 0 ? "" : "이주정착금"}{" "}
+                {result === 0 ? "" : "주거이전비"}{" "}
+                {mselectVal.sum === 0 ? "" : "이사비"}
+              </Result.td>
+            </tr>
+          </tbody>
+        </Result.table>
       </div>
     </div>
   );
