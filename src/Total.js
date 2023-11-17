@@ -6,8 +6,7 @@ import axios from "axios";
 
 const API_KEY = process.env.REACT_APP_API_KEY + "=";
 const priceOfWageUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/365/TX_36504_A001_1/2/1/20231106140112&prdSe=H&newEstPrdCnt=1`;
-const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U027/2/1/20231106103754&prdSe=Y&startPrdDe=2022&endPrdDe=2022`;
-
+const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U027/2/1/20231106103754&prdSe=Y&newEstPrdCnt=1`;
 function Total() {
   //청구인, 대상적격여부 확인
   const [inputName, setInputName] = useState("");
@@ -88,6 +87,7 @@ function Total() {
         inputList.inputEligibility === "agree" &&
         inputList.inputAgreeDay < inputNewer &&
         inputList.inputUsage === "house" &&
+        inputSelectVal === "newer" &&
         inputList.inputMoveInDate < inputNewer
       ) {
         filterOwner(inputPeople, inputSelectVal);
@@ -127,7 +127,7 @@ function Total() {
     let amount;
     let result = 0;
     let currentDate = cDate;
-    const standardDate = new Date("2020-12-11");
+    const standardDate = new Date("2020-12-11"); //차량운임비 기준알자
     amount =
       Math.floor(Math.round(inputAmountVal * 0.3) / 10) * 10 * inputShareVal;
     if (currentDate > standardDate) {
@@ -396,7 +396,10 @@ function Total() {
                   <input
                     type="date"
                     onChange={(event) => {
-                      const inputMoveInDate = event.target.value;
+                      date = event.target.value;
+                      setCDate(new Date(date));
+                      calAmount(inputAmountVal, cDate);
+                      relocationSettlementEligibility();
                     }}
                   ></input>
                 </Result.td>
@@ -470,6 +473,40 @@ function Total() {
             }));
           }}
         ></input>
+        <select
+          onChange={(event) => {
+            selectVal = event.target.value;
+            setInputSelectVal(selectVal);
+            filterOwner(inputPeople, selectVal);
+          }}
+        >
+          <option value="none">소유자 구분</option>
+          <option value="owner">소유자</option>
+          <option value="newer">세입자</option>
+        </select>
+        <span>가구원수 입력: </span>
+        <input
+          type="text"
+          minLength="1"
+          maxLength="1"
+          required
+          onChange={(event) => {
+            inputpVal = Number(event.target.value);
+            setInputPeople(inputpVal);
+            filterPeople(inputpVal);
+            filterOwner(inputpVal, inputSelectVal);
+            housingTransferExpensesEligibility();
+          }}
+        ></input>
+        <span>주택(연면적):</span>
+        <input
+          type="text"
+          onChange={(event) => {
+            areaVal = Number(event.target.value);
+            setInputAreaVal(areaVal);
+            combinedArr();
+          }}
+        ></input>
       </div>
       <div>
         <h3>대상적격</h3>
@@ -482,9 +519,13 @@ function Total() {
             }));
             if (inputEligibility === "disagree") {
               setAmountResult(0);
+              const data = "무허가";
+              setNote(data);
             } else if (inputEligibility === "agree") {
               filterOwner(inputPeople, inputSelectVal);
               calAmount(inputAmountVal, cDate);
+              const data = "적법건축물";
+              setNote(data);
             }
           }}
         >
@@ -513,9 +554,13 @@ function Total() {
             if (inputUsage === "nonhouse") {
               setAmountResult(0);
               setResult(0);
+              const data = "무허가";
+              setNote(data);
             } else if (inputUsage === "house") {
               filterOwner(inputPeople, inputSelectVal);
               calAmount(inputAmountVal, cDate);
+              const data = "적법건축물";
+              setNote(data);
             }
           }}
         >
@@ -535,8 +580,12 @@ function Total() {
           }}
         ></input>
         <span>비고: </span>
-        <span>{note}</span>
-        <button onClick={fnNote}>입력</button>
+        <span>
+          {inputList.inputUsage === "nonhouse" ||
+          inputList.inputEligibility === "disagree"
+            ? "무허가"
+            : "적법건축물"}
+        </span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
@@ -560,65 +609,13 @@ function Total() {
             ></input>
           </div>
           <div>
-            <input
-              type="date"
-              onChange={(event) => {
-                date = event.target.value;
-                setCDate(new Date(date));
-                calAmount(inputAmountVal, cDate);
-                relocationSettlementEligibility();
-              }}
-            ></input>
-            <button
-              onClick={() => {
-                relocationSettlementEligibility();
-              }}
-            >
-              이주정착금 산정
-            </button>
-          </div>
-
-          <div>
             <span>이주정착금: </span>
             {amountResult}
           </div>
         </div>
         <div>
           <h1>주거이전비</h1>
-          <div>
-            <span>가구원수 입력: </span>
-            <input
-              type="text"
-              minLength="1"
-              maxLength="1"
-              required
-              onChange={(event) => {
-                inputpVal = Number(event.target.value);
-                setInputPeople(inputpVal);
-                filterPeople(inputpVal);
-                filterOwner(inputpVal, inputSelectVal);
-              }}
-            ></input>
-            <select
-              onChange={(event) => {
-                selectVal = event.target.value;
-                setInputSelectVal(selectVal);
-                filterOwner(inputPeople, selectVal);
-              }}
-            >
-              <option value="none">소유자 구분</option>
-              <option value="owner">소유자</option>
-              <option value="newer">세입자</option>
-            </select>
-            <button
-              onClick={() => {
-                housingTransferExpensesEligibility();
-                console.log(result);
-              }}
-            >
-              주거이전비산정
-            </button>
-          </div>
+          <div></div>
           <h1>개월별 가계지출비</h1>
           <HTEStyle.Table>
             <thead>
@@ -667,26 +664,7 @@ function Total() {
         </div>
         <div>
           <h1>이사비</h1>
-          <div>
-            <span>주택(연면적):</span>
-            <input
-              type="text"
-              value={inputAreaVal}
-              onChange={(event) => {
-                areaVal = Number(event.target.value);
-                setInputAreaVal(areaVal);
-                combinedArr();
-              }}
-            ></input>
-          </div>
-          <button
-            onClick={() => {
-              movingExpenseEligibility();
-              console.log(inputList.inputMoveInDate < inputMovingDate);
-            }}
-          >
-            산정
-          </button>
+
           <h2>임금</h2>
           {priceOfWage.map((data, index) => (
             <div key={index}>{data}</div>
@@ -722,6 +700,16 @@ function Total() {
       <div>
         <button
           onClick={() => {
+            relocationSettlementEligibility();
+            housingTransferExpensesEligibility();
+            movingExpenseEligibility();
+            console.log(result);
+          }}
+        >
+          산정
+        </button>
+        <button
+          onClick={() => {
             totalSum();
             console.log(inputSelectVal);
           }}
@@ -740,7 +728,7 @@ function Total() {
           </thead>
           <tbody>
             <tr>
-              <Result.td>{getSum}</Result.td>
+              <Result.td>{getSum === "undefined" ? 0 : getSum}</Result.td>
               <Result.td>
                 {amountResult === 0 ? "부적격" : amountResult}
               </Result.td>

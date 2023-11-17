@@ -14,10 +14,8 @@ const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?metho
 ];*/
 function HousingTransgerExpense() {
   const [initialVal, setInitialVal] = useState([]);
-  const [byYearCondtionVal, setByYearConditionVal] = useState([]);
   const [totalVal, setTotalVal] = useState([]);
   const [peopleTotalVal, setPeopleTotalVal] = useState([]);
-  const [inputVal, setInputVal] = useState("");
   const [inputSelectVal, setInputSelectVal] = useState("");
   const [inputPeople, setInputPeople] = useState("");
   const [result, setResult] = useState("");
