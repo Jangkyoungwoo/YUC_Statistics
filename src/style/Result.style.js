@@ -3,6 +3,9 @@ import styled from "styled-components";
 export const table = styled.table`
   border-collapse: collapse;
   border-spacing: 0;
+  width: 700px;
+  border-radius: 18px;
+  color: #55b6ff;
 `;
 export const td = styled.td`
   border-color: black;
@@ -15,6 +18,9 @@ export const td = styled.td`
   word-break: normal;
   text-align: left;
   vertical-align: top;
+  background-color: ${(props) => props.bgColor};
+  border-color: #d7e3f1;
+  font-family: SpoqaHanSansNeo-Medium;
 `;
 export const th = styled.th`
   border-color: black;
@@ -28,4 +34,7 @@ export const th = styled.th`
   word-break: normal;
   text-align: left;
   vertical-align: top;
+  background-color: ${(props) => props.bgColor};
+  border-color: #d7e3f1;
+  font-family: SpoqaHanSansNeo-Medium;
 `;

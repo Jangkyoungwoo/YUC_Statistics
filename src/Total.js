@@ -7,7 +7,7 @@ import axios from "axios";
 const API_KEY = process.env.REACT_APP_API_KEY + "=";
 const priceOfWageUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/365/TX_36504_A001_1/2/1/20231106140112&prdSe=H&newEstPrdCnt=1`;
 const houseHoldsTotalIncomeAndExpenditureUrl = `/openapi/statisticsData.do?method=getList&apiKey=${API_KEY}&format=json&jsonVD=Y&userStatsId=tpg42/101/DT_1L9U027/2/1/20231106103754&prdSe=Y&newEstPrdCnt=1`;
-function Total() {
+function Total(props) {
   //청구인, 대상적격여부 확인
   const [inputName, setInputName] = useState("");
   const [inputOwner, setInputOwner] = useState("");

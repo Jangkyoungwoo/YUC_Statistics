@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: "SpoqaHanSansNeo-Medium";
 }
 
 .App-logo {
@@ -35,4 +36,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@font-face {
+  font-family: "SpoqaHanSansNeo-Medium";
+  src: url("./fonts/SpoqaHanSansNeo_OTF_subset/SpoqaHanSansNeo-Medium.woff")
+    format("woff");
 }
