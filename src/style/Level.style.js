@@ -10,7 +10,7 @@ export const button = styled.button`
   color: #d8dadf;
   font-family: SpoqaHanSansNeo-Medium;
   &:hover {
-    color: #17c4e5;
-    background-color: #b7e1ff;
+    color: #909ace;
+    background-color: white;
   }
 `;

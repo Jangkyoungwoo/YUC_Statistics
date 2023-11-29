@@ -26,13 +26,14 @@ export const div = styled.div`
 export const btn = styled.button`
   width: 200px;
   height: 30px;
-  background-color: #55b6ff;
+  background-color: #6959f8;
   color: white;
   border-radius: 8px;
   border: none;
   font-family: SpoqaHanSansNeo-Medium;
   &:hover {
-    color: #2ac8e3;
-    background-color: #d0f3fa;
+    color: #909ace;
+    background-color: white;
+    border: 1px solid;
   }
 `;

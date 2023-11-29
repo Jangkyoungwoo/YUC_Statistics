@@ -7,11 +7,16 @@ import Calculate from "./components/Calculate";
 import List from "./components/List";
 import ImportFile from "./components/ImportFile";
 
-function App({}) {
+function App() {
+  const [send, setSend] = useState({});
+  const [sendTwo, setSendTwo] = useState({});
   //스클롤 이동
   const scrollInput = useRef();
   const scrollCal = useRef();
   const scrollExport = useRef();
+  const handleDataChange = (newData) => {
+    setSend(newData);
+  };
   const onMoveToInput = () => {
     scrollInput.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -41,7 +46,7 @@ function App({}) {
         }}
         ref={scrollInput}
       >
-        <InputData />
+        <InputData onSetSend={setSend} onSetSendTwo={setSendTwo} />
         <div style={{ display: "flex", flexDirection: "column" }}>
           <Level
             onMoveToInput={onMoveToInput}
@@ -62,7 +67,7 @@ function App({}) {
         }}
         ref={scrollCal}
       >
-        <Calculate />
+        <Calculate send={send} sendTwo={sendTwo} />
       </div>
       <div
         style={{

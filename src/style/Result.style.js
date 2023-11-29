@@ -5,7 +5,7 @@ export const table = styled.table`
   border-spacing: 0;
   width: 700px;
   border-radius: 18px;
-  color: #55b6ff;
+  color: #74798c;
 `;
 export const td = styled.td`
   border-color: black;

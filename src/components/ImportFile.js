@@ -1,7 +1,10 @@
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import * as ImportFileStyle from "../style/ImportFile.style";
+import * as Import from "../style/Input.style";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import FilePresentIcon from "@mui/icons-material/FilePresent";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 function ImportFile() {
   const onDrop = useCallback((acceptedFiles) => {
@@ -44,19 +47,45 @@ function ImportFile() {
             {isDragActive ? (
               <p>이미지를 여기에 드롭하세요</p>
             ) : (
-              <div>
+              <div
+                style={{
+                  height: "200px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <UploadFileIcon />
                 <p>파일을 등록해 주세요</p>
               </div>
             )}
           </div>
-          <div style={{ float: "right" }}>
-            <input type="file"></input>
-            <button>업로드</button>
+          <div
+            style={{ display: "flex", marginLeft: "auto", marginTop: "5px" }}
+          >
+            <label
+              for="input-file"
+              style={{ fontSize: "13px", color: "#88898A" }}
+            >
+              첨부 파일은 최대 3개, 30MB까지 등록 가능합니다.
+            </label>
+            <input
+              id="input-file"
+              type="file"
+              style={{ display: "none" }}
+            ></input>
+            <ImportFileStyle.btn>
+              <ArrowUpwardIcon />
+              업로드
+            </ImportFileStyle.btn>
           </div>
         </div>
       </div>
-      <button>결과 파일 다운로드</button>
+      <div
+        style={{ marginTop: "50px", display: "flex", justifyContent: "center" }}
+      >
+        <Import.btn>결과 파일 다운로드</Import.btn>
+      </div>
     </div>
   );
 }

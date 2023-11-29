@@ -47,6 +47,64 @@ function Total(props) {
   const [inputAreaVal, setInputAreaVal] = useState("");
   let areaVal;
   let vehicleCostVal = 222000; //차량운임비
+  const getData = (
+    inputName,
+    selectVal,
+    inputAdress,
+    inputpVal,
+    inputClaimant,
+    areaVal,
+    inputAmount,
+    inputEligibility,
+    inputAgreeDay,
+    inputUsage,
+    inputMoveInDate,
+    settleMentDate,
+    inputOwner,
+    inputNewer,
+    inputDisagreeNewer,
+    inputMovingDate,
+    getSum,
+    note,
+    inputList,
+    inputAmountVal,
+    inputShareVal
+  ) => {
+    setInputName(inputName);
+    setInputSelectVal(selectVal);
+    setInputList((prevState) => ({
+      ...prevState,
+      inputAdress: inputAdress,
+    }));
+    setInputPeople(inputpVal);
+    setInputList((prevState) => ({
+      ...prevState,
+      inputClaimant: inputClaimant,
+    }));
+    setInputAreaVal(areaVal);
+    setInputAmountVal(inputAmount);
+    setInputList((prevState) => ({
+      ...prevState,
+      inputEligibility: inputEligibility,
+    }));
+    setInputList((prevState) => ({
+      ...prevState,
+      inputAgreeDay: inputAgreeDay,
+    }));
+    setInputList((prevState) => ({
+      ...prevState,
+      inputUsage: inputUsage,
+    }));
+    setInputList((prevState) => ({
+      ...prevState,
+      inputMoveInDate: inputMoveInDate,
+    }));
+    setCDate(settleMentDate);
+    setInputOwner(inputOwner);
+    setinputNewer(inputNewer);
+    setinputDisagreeNewer(inputDisagreeNewer);
+    setInputMovingDate(inputMovingDate);
+  };
   const fnNote = () => {
     if (
       inputList.inputEligibility === "disagree" ||

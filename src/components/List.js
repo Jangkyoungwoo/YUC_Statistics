@@ -7,7 +7,7 @@ function List() {
         style={{
           display: "flex",
           flexDirection: "column",
-          background: " #55b6ff",
+          background: "#5B6ABF",
           padding: "20px",
           borderRadius: "10px",
           boxShadow: "3px 3px 3px 3px #E2E2EE",
