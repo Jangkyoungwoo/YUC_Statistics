@@ -80,6 +80,7 @@ function App() {
       >
         <ImportFile></ImportFile>
       </div>
+      <Total />
     </div>
   );
 }

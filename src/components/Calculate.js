@@ -5,71 +5,88 @@ import * as CalculateStyle from "../style/Calculate.style";
 function Calculate({ send, sendTwo }) {
   const [data, setData] = useState({});
   const [dataTwo, setDataTwo] = useState({});
-  const getData = () => {
-    const obj = send;
-    setData(obj);
-    setDataTwo(sendTwo);
-    console.log(sendTwo);
-  };
+
   const relocationSettlementEligibility = () => {
     if (
       sendTwo.permission === "agree" &&
-      sendTwo.agreeDay < settlementDate &&
+      new Date(sendTwo.agreeDay) < new Date(sendTwo.settlementDate) &&
       sendTwo.usage === "house" &&
       sendTwo.owner === "owner" &&
-      sendTwo.moveInDate < settlementDate
+      new Date(sendTwo.moveInDate) < new Date(sendTwo.settlementDate)
     ) {
-      {
-        data.settlementRes;
-      }
+      setDataTwo((prevState) => ({
+        ...prevState,
+        settlementRes: data.settlementRes,
+      }));
     } else {
-      setAmountResult(0);
-      totalSum();
+      setDataTwo((prevState) => ({
+        ...prevState,
+        settlementRes: 0,
+      }));
     }
   };
   const housingTransferExpensesEligibility = () => {
     if (
       sendTwo.permission === "agree" &&
-      sendTwo.agreeDay < sendTwo.inputOwner &&
+      new Date(sendTwo.agreeDay) < new Date(sendTwo.inputOwner) &&
       sendTwo.usage === "house" &&
       sendTwo.owner === "owner" &&
-      sendTwo.moveInDate < sendTwo.inputOwner
+      new Date(sendTwo.moveInDate) < new Date(sendTwo.inputOwner)
     ) {
-      filterOwner(inputPeople, inputSelectVal);
+      setDataTwo((prevState) => ({
+        ...prevState,
+        housingTransferRes: data.housingTransferRes,
+      }));
     } else {
       if (
         sendTwo.permission === "agree" &&
-        sendTwo.agreeDay < sendTwo.inputNewer &&
+        new Date(sendTwo.agreeDay) < new Date(sendTwo.inputNewer) &&
         sendTwo.usage === "house" &&
         sendTwo.owner === "newer" &&
-        sendTwo.moveInDate < sendTwo.inputNewer
+        new Date(sendTwo.moveInDate) < new Date(sendTwo.inputNewer)
       ) {
-        filterOwner(inputPeople, inputSelectVal);
+        setDataTwo((prevState) => ({
+          ...prevState,
+          housingTransferRes: data.housingTransferRes,
+        }));
       } else {
         if (
-          note === "무허가" &&
-          sendTwo.moveInDate < sendTwo.inputDisagreeNewer
+          sendTwo.note === "무허가" &&
+          new Date(sendTwo.moveInDate) < new Date(sendTwo.inputDisagreeNewer)
         ) {
-          filterOwner(inputPeople, inputSelectVal);
+          return data.housingTransferRes;
         } else {
-          setResult(0);
+          setDataTwo((prevState) => ({
+            ...prevState,
+            housingTransferRes: 0,
+          }));
         }
       }
     }
   };
   const movingExpenseEligibility = () => {
-    if (sendTwo.moveInDate < sendTwo.inputMovingDate) {
-      selectArr();
-      console.log(mselectVal.sum);
+    if (new Date(sendTwo.moveInDate) < new Date(sendTwo.inputMovingDate)) {
+      return data.sum;
     } else {
-      setmselectVal((prevState) => ({
+      setData((prevState) => ({
         ...prevState,
         sum: 0,
       }));
-      console.log(mselectVal.sum);
+      return "부적격";
     }
   };
-  useEffect(() => getData);
+  const getData = () => {
+    const obj = send;
+    setData(obj);
+    setDataTwo(sendTwo);
+    relocationSettlementEligibility();
+    housingTransferExpensesEligibility();
+    movingExpenseEligibility();
+    console.log(sendTwo);
+  };
+  useEffect(() => {
+    getData();
+  }, [send, sendTwo]);
   return (
     <div
       style={{
@@ -79,7 +96,7 @@ function Calculate({ send, sendTwo }) {
         boxShadow: "3px 3px 3px 3px #E2E2EE",
       }}
     >
-      <h1>법적보상비 산정</h1>
+      <h1>법정보상비 산정</h1>
       <div>
         <h3>이주정착금 </h3>
         <CalculateStyle.categoryDiv>
@@ -170,7 +187,7 @@ function Calculate({ send, sendTwo }) {
             marginRight: "50px",
           }}
         >
-          <div style={{ width: "250px" }}>
+          <div style={{ width: "300px" }}>
             <CalculateStyle.sumDiv>
               <span>이주정착금</span>
               <span>{data.settlementRes}</span>
@@ -185,7 +202,7 @@ function Calculate({ send, sendTwo }) {
             </CalculateStyle.sumDiv>
             <CalculateStyle.sumDiv>
               <span>지급대상</span>
-              <span>#,##0</span>
+              <span>이주정착금 주거이전비 이사비</span>
             </CalculateStyle.sumDiv>
             <CalculateStyle.sumDiv>
               <span>총지급액</span>

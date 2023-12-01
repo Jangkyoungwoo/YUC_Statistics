@@ -28,7 +28,7 @@ function InputPage({ onSetSend, onSetSendTwo }) {
   const postRelocationSettleMent = async (amount, date, share) => {
     try {
       await axios
-        .post("/relocationSettlement", {
+        .post("/relocationSettlement/", {
           amount: `${amount}`,
           date: `${date}`,
           share: `${share}`,
@@ -47,7 +47,7 @@ function InputPage({ onSetSend, onSetSendTwo }) {
   const postHousingTransferExpenses = async (headCount, owner) => {
     try {
       await axios
-        .post("/housingTransferExpenses", {
+        .post("/housingTransfer/post", {
           headCount: headCount,
           owner: owner,
         })
@@ -64,7 +64,7 @@ function InputPage({ onSetSend, onSetSendTwo }) {
   const postMovingExpenses = async (width) => {
     try {
       await axios
-        .post("/movingExpenses", {
+        .post("/movingExpenses/", {
           width: `${width}`,
         })
         .then((res) => {
@@ -83,6 +83,11 @@ function InputPage({ onSetSend, onSetSendTwo }) {
     postRelocationSettleMent(amount, date, share);
     postHousingTransferExpenses(headCount, owner);
     postMovingExpenses(width);
+    if (list.usage === "nonhouse" || list.permission === "disagree") {
+      list.note = "무허가";
+    } else {
+      list.note = "적법건축물";
+    }
     onSetSend(obj);
     onSetSendTwo(list);
   };
@@ -259,7 +264,7 @@ function InputPage({ onSetSend, onSetSendTwo }) {
               <Result.td bgColor="#F0F3FA">전입일</Result.td>
               <Result.td>
                 <Input.inputDate
-                  type="text"
+                  type="date"
                   onChange={(event) => {
                     setList((prevState) => {
                       return { ...prevState, moveInDate: event.target.value };

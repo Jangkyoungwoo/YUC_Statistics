@@ -19,7 +19,7 @@ function Level({ onMoveToInput, onMoveToCal, onMoveToExport }) {
         <h4>절차</h4>
         <LevelStyle.button onClick={onMoveToInput}>입력</LevelStyle.button>
         <LevelStyle.button onClick={onMoveToCal}>
-          법적보상비 산정
+          법정보상비 산정
         </LevelStyle.button>
         <LevelStyle.button onClick={onMoveToExport}>내보내기</LevelStyle.button>
       </div>
